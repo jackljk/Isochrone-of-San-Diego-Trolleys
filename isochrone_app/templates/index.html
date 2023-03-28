@@ -10,7 +10,7 @@
 
 <body>
     <h1>Home</h1>
-    <form action="/map" method="post">
+    <form action="/add_location" method="post">
         <label for="name">Name:</label>
         <input type="string" id="name" name="name"><br><br>
 
@@ -20,8 +20,69 @@
         <label for="lng">Longitude:</label>
         <input type="float" id="lng" name="lng"><br><br>
 
-        <input type="submit" value="Submit">
+        <input type="submit" value="add_data">
     </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, location in locations.items() %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ location['lat'] }}</td>
+                <td>{{ location['lng'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2> Remove Location </h2>
+    <form action="/remove_location" method="post">
+        <label for="name">Name:</label>
+        <input type="string" id="name" name="name"><br><br>
+
+        <input type="submit" value="remove_data">
+    </form>
+
+    <h2>Extra Information</h2>
+    <form action="/map", method="post">
+        <label for="APP_ID">APP ID:</label>
+        <input type="string" id="APP_ID" name="APP_ID"><br><br>
+
+        <label for="API_KEY">API Key:</label>
+        <input type="string" id="API_KEY" name="API_KEY"><br><br>
+
+        <label for="travelTime">Travel Time (In Minutes):</label>
+        <input type="float" id="travelTime" name="travelTime"><br><br>
+
+        <label for="modeTransport">Mode of Transportation</label>
+        <select>
+            <option value="driving">Driving: </option>
+            <option value="walking">Walking: </option>
+            <option value="cycling">Cycling: </option>
+            <option value="eBike">E-Bikes: </option>
+        </select>
+
+        <input type="submit" value="submit">
+    </form>
+
+    <h2>Trolley Stations</h2>
+    <form>
+        <label for="trolleyStations">Trolley Stations:</label>
+        <select>
+            <option value="Blue Line">Blue Line</option>
+            <option value="Green Line">Green Line</option>
+            <option value="Orange Line">Orange Line</option>
+        </select>
+    </form>
+
+    
 </body>
 
 </html>

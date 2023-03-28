@@ -1,17 +1,16 @@
 from datetime import datetime
 import json
 import requests
+import pandas as pd
 
-APP_ID = '20c42aed'
-API_KEY = '92ea72b19d6a1c40d47c6f1737ba920a'
 URL = "https://api.traveltimeapp.com/v4/time-map"
 
 def make_payload_search(location_name, lat, lng, transportation_type, travel_time):
     search = {
             "id": location_name,
             "coords": {
-                "lat": lat,
-                "lng": lng
+                "lat": float(lat),
+                "lng": float(lng)
             },
             "transportation": transportation_type,
             "departure_time": datetime.utcnow().isoformat(),
@@ -27,8 +26,8 @@ def make_union(locations):
     return [unions]
 
 
-def get_travel_times(locations, transportation_type, travel_time = 600):
-
+def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_time = 600):
+    geojsons = []
     payload_list = []
     curr_locations = []
 
@@ -54,25 +53,26 @@ def get_travel_times(locations, transportation_type, travel_time = 600):
 
 
             response = requests.post(URL, headers=headers, data=payload_str)
-            filename = f"{location_name}_{transportation_type['type']}_{i+1}.geojson"
 
-            with open('test/' + filename, "w") as text_file:
-                text_file.write(response.text)
+
+
+            geojsons.append(json.loads(response.text))
+
             # Reset the payload_list for the next group of 10 locations
             payload_list = []
             curr_locations = []
 
-
-def add_dict(name, lat, long, d):
-    if name == '':
-        d['Location ' + (len(d) + 1)] = {'lat': lat, 'lng': long}
-
-    if name not in d:
-        d[name] = {'lat': lat, 'lng': long}
+    return geojsons
 
 
-def make_dict(name, lat, long):
-    d = {}
-    for i in range(len(name)):
-        add_dict(name[i], lat[i], long[i], d)
-    return d
+
+def get_census_data(state_code, county_code):
+    """
+    Pull the census data for a given state and county and return a dataframe
+    """
+    API_KEY = "1e1f8670c9944ee8269a8d7065315bcd2f3eb0c8"
+    url = f'https://api.census.gov/data/2020/dec/pl?get=NAME,H1_001N&for=block:*&in=state:{state_code}&in=county:{county_code}&key={API_KEY}'
+    response = requests.get(url)
+    data = response.json()
+    df = pd.DataFrame(data[1:], columns=data[0])
+    return df
