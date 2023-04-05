@@ -5,22 +5,39 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <title>Index</title>
 </head>
 
 <body>
     <h1>Home</h1>
     <form action="/add_location" method="post">
-        <label for="name">Name:</label>
-        <input type="string" id="name" name="name"><br><br>
-
-        <label for="lat">Lattitude:</label>
-        <input type="float" id="lat" name="lat"><br><br>
-
-        <label for="lng">Longitude:</label>
-        <input type="float" id="lng" name="lng"><br><br>
-
-        <input type="submit" value="add_data">
+        <h3>Select the input type:</h3>
+        <input type="radio" id="latlng" name="input_type" value="latlng" checked>
+        <label for="latlng">Latitude and Longitude:</label>
+        <br>
+        <input type="radio" id="address" name="input_type" value="address">
+        <label for="address">Address:</label>
+        <br><br>
+    
+        <div id="latlng_fields">
+            <h3>Give Name and Lat and Long</h3>
+            <label for="name">Name:</label>
+            <input type="string" id="name" name="name"><br><br>
+    
+            <label for="lat">Lattitude:</label>
+            <input type="float" id="lat" name="lat"><br><br>
+    
+            <label for="lng">Longitude:</label>
+            <input type="float" id="lng" name="lng"><br><br>
+        </div>
+    
+        <div id="address_fields" style="display:none">
+            <h3>Give Human readable Address</h3>
+            <input type="string" id="address" name="address"><br><br>
+        </div>
+    
+        <input type="submit" value="Add Data">
     </form>
 
     <table>
@@ -69,20 +86,13 @@
             <option value="eBike">E-Bikes: </option>
         </select>
 
+        <h2>Trolley Stations:</h2>
+        <input type="checkbox" name="trolley" value="blue">Blue Line<br>
+        <input type="checkbox" name="trolley" value="green">Green Line<br>
+        <input type="checkbox" name="trolley" value="orange">Orange Line<br>
+
         <input type="submit" value="submit">
     </form>
-
-    <h2>Trolley Stations</h2>
-    <form>
-        <label for="trolleyStations">Trolley Stations:</label>
-        <select>
-            <option value="Blue Line">Blue Line</option>
-            <option value="Green Line">Green Line</option>
-            <option value="Orange Line">Orange Line</option>
-        </select>
-    </form>
-
-    
 </body>
 
 </html>
