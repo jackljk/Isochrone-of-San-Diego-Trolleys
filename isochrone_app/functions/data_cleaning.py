@@ -11,9 +11,8 @@ def union_stations(stations):
     poly = sg.Polygon()
     for station in stations:
         for i in range(len(station['features'])):
-            if "last station: " in station['features'][i]['properties']['search_id']:
+            if "last location: " in station['features'][i]['properties']['search_id']:
                 poly = poly.union(sg.shape(station['features'][i]['geometry']))
-
 
     # Convert the unioned polygon into a GeoJSON Feature
     union_feature = geojson.Feature(geometry=poly, properties={})
