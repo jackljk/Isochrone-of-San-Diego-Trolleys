@@ -43,8 +43,6 @@ def get_density_by_bg(df, gdf, unions, county='SD'):
     df['H1_001N'] = df['H1_001N'].astype(str)
 
     # ----------------------------
-    path = f'tracts_geo_json/bg/bg_{county}.geojson'
-
     # get all tracts in df that are in tracts
     temp = gdf[(gdf['TRACTCE'].isin(tracts)) & (gdf['COUNTYFP'] == '073')].sort_values(by='TRACTCE')
 
@@ -55,6 +53,9 @@ def get_density_by_bg(df, gdf, unions, county='SD'):
     temp['tract'] = temp['TRACTCE'] + temp['BLKGRPCE']
 
     # get all polygons that intersect with the union of the biking geojsons
+    # wrtite the union to a temp file
+    with open('temp.geojson', 'w') as f:
+        f.write(unions)
     temp = temp[temp.intersects(sg.shape(geojson.loads(unions)[0]['geometry']))]
 
     # Save temp as a geojson to a variable

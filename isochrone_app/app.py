@@ -8,7 +8,6 @@ from functions.get_data import get_travel_times, get_census_data
 from functions.data_cleaning import union_stations, get_density_by_bg, update_shapes
 from functions.make_map import create_new_map, update_map_cp, update_map_isochrone
 from functions.helper import trolley_checklist
-import json
 import geopandas as gpd
 import geojson
 import folium
@@ -20,7 +19,7 @@ GMAPI = "AIzaSyDSbu_7Yc_uqzjni4DboQS53L14pulaMj4"
 gmaps = googlemaps.Client(key=GMAPI)
 # Variables
 customLocations = {} # Dictionary of locations given by user
-# gdf = gpd.read_file('isochrone_app\\CA_shape_file\\bg\\cb_2021_06_bg_500k.shp') # Shape file for San Diego County
+gdf = gpd.read_file('isochrone_app\\CA_shape_file\\bg\\cb_2021_06_bg_500k.shp') # Shape file for San Diego County
 
 
 # Create Flask App
@@ -46,7 +45,8 @@ def add_location():
     lng = flask.request.form['lng']
     # For Address
     address = flask.request.form['address']
-    address = address + ", San Diego, CA " + flask.request.form['zipcode']
+    zipcode = flask.request.form['zipcode']
+    address = address + ", San Diego, CA " + zipcode
     
     # Handling if location already exists Error
     if name in customLocations.keys() or address in customLocations.keys():
@@ -54,7 +54,7 @@ def add_location():
         return flask.redirect('/')
     
     # Handling if information is missing
-    if lat == '' or lng == '' or address == '' or name == '': 
+    if (lat == '' or lng == '' or name == '') and (address == '' or zipcode == ''): 
         flask.flash('Missing information')
         return flask.redirect('/')
     
@@ -71,7 +71,7 @@ def add_location():
         if result:
             customLocations[address] = {'lat': result[0]['geometry']['location']['lat'], 'lng': result[0]['geometry']['location']['lng']}
         else:
-            # If address is invalid handle error
+            # If address does not return anything handle error
             flask.flash('Invalid Address')
             return flask.redirect('/')
             
@@ -82,7 +82,7 @@ def remove_location():
     """
     Removes a location from the customLocations dictionary
     """
-    name = flask.request.form['name']
+    name = flask.request.form['remove']
     del customLocations[name]
     return flask.redirect('/')
 
@@ -103,7 +103,15 @@ def make_map():
     
     # Getting Mode of Transportation
     mode_of_transport = flask.request.form['modeTransport']
-    travel_time_val = flask.request.form['travelTime']
+    travel_time_val = flask.request.form['travelTime'] * 60
+    avg_speed = flask.request.form['avgSpeed']
+    
+    
+    # Error Handling if travel time is missing
+    if travel_time_val == '':
+        flask.flash('Missing Travel Time')
+        return flask.redirect('/')
+    
     
     # Fixing mode of transport for API
     if mode_of_transport == "driving":
@@ -114,11 +122,17 @@ def make_map():
         mode_of_transport = {"type": "cycling"}
     if mode_of_transport == "eBike":
         mode_of_transport = {"type": "cycling"}
-        travel_time_val = 2 * travel_time_val
+        travel_time_val = str((float(avg_speed)/10) * float(travel_time_val))
+        
 
     # Getting API Key
     API_KEY = flask.request.form['API_KEY']
     APP_ID = flask.request.form['APP_ID']
+    
+    # Error Handling if API Key or APP ID is missing
+    if API_KEY == '' or APP_ID == '':
+        flask.flash('Missing API Key or APP ID')
+        return flask.redirect('/')
 
     # add multiple dictionaries into one dictionary
     locations = {**customLocations}
@@ -141,8 +155,8 @@ def make_map():
 
     # Create Map
     map_obj = create_new_map()
-    update_map_cp(map_obj, geojson_json, data_df, 'test')
-    update_map_isochrone(map_obj, union, 'test', 'red')
+    update_map_cp(map_obj, geojson_json, data_df, 'Populations')
+    update_map_isochrone(map_obj, union, 'Isochrone', 'red')
 
     # add layer control
     folium.LayerControl().add_to(map_obj)

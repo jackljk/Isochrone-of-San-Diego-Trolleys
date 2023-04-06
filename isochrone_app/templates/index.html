@@ -76,7 +76,11 @@
     <h2>Remove Location</h2>
     <form action="/remove_location" method="post">
       <label for="name">Name:</label>
-      <input type="string" id="name" name="name" /><br /><br />
+      <select id="remove" name="remove">
+        {% for name, location in locations.items() %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+      </select>
 
       <input type="submit" value="remove_data" />
     </form>
@@ -93,12 +97,18 @@
       <input type="float" id="travelTime" name="travelTime" /><br /><br />
 
       <label for="modeTransport">Mode of Transportation</label>
-      <select>
-        <option value="driving">Driving:</option>
-        <option value="walking">Walking:</option>
-        <option value="cycling">Cycling:</option>
-        <option value="eBike">E-Bikes:</option>
+      <select id="transportSelection" name="modeTransport">
+        <option value="driving">Driving</option>
+        <option value="walking">Walking</option>
+        <option value="cycling">Cycling</option>
+        <option value="eBike">E-Bikes</option>
       </select>
+      <div id="avgspeed" style="display: none">
+        <label for="avgSpeed">Average Speed Mph:</label>
+        <select id="avgSpeedSelector" name="avgSpeed">
+        </select>
+        <br /><br />
+      </div>
 
       <h2>Trolley Stations:</h2>
       <input type="checkbox" name="trolley" value="blue" />Blue Line<br />
