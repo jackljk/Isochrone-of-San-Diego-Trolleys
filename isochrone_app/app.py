@@ -12,39 +12,85 @@ import json
 import geopandas as gpd
 import geojson
 import folium
+import googlemaps
 
 
 # CONSTANTS
+GMAPI = "AIzaSyDSbu_7Yc_uqzjni4DboQS53L14pulaMj4"
+gmaps = googlemaps.Client(key=GMAPI)
+# Variables
 customLocations = {} # Dictionary of locations given by user
-gdf = gpd.read_file(r'CA_shape_file\bg\cb_2021_06_bg_500k.shp') # Shape file for San Diego County
+# gdf = gpd.read_file('isochrone_app\\CA_shape_file\\bg\\cb_2021_06_bg_500k.shp') # Shape file for San Diego County
 
 
 # Create Flask App
 app = flask.Flask(__name__, template_folder='templates', static_url_path='/static')
+app.config['SECRET_KEY'] = "6969696969"
 
 
 @app.route('/')
 def index():
+    """
+    Renders the index.html page
+    """
     return flask.render_template('index.html', locations=customLocations)
 
 @app.route('/add_location', methods=['POST'])
 def add_location():
+    """
+    Adds a location to the customLocations dictionary
+    """
+    # For Lat lng
     name = flask.request.form['name']
     lat = flask.request.form['lat']
     lng = flask.request.form['lng']
-
-
-    customLocations[name] = {'lat': lat, 'lng': lng}
+    # For Address
+    address = flask.request.form['address']
+    address = address + ", San Diego, CA " + flask.request.form['zipcode']
+    
+    # Handling if location already exists Error
+    if name in customLocations.keys() or address in customLocations.keys():
+        flask.flash('Location ' + name + ' already exists')
+        return flask.redirect('/')
+    
+    # Handling if information is missing
+    if lat == '' or lng == '' or address == '' or name == '': 
+        flask.flash('Missing information')
+        return flask.redirect('/')
+    
+    # Adding location to dictionary
+    radio_button = flask.request.form['input_type']
+    if radio_button == 'latlng':
+        # For when lat lng is given
+        customLocations[name] = {'lat': lat, 'lng': lng}
+    else:
+        # For when address is given
+        result = gmaps.geocode(address)
+        
+        # Check if address is valid via gmaps API
+        if result:
+            customLocations[address] = {'lat': result[0]['geometry']['location']['lat'], 'lng': result[0]['geometry']['location']['lng']}
+        else:
+            # If address is invalid handle error
+            flask.flash('Invalid Address')
+            return flask.redirect('/')
+            
     return flask.redirect('/')
 
 @app.route('/remove_location', methods=['POST'])
 def remove_location():
+    """
+    Removes a location from the customLocations dictionary
+    """
     name = flask.request.form['name']
     del customLocations[name]
     return flask.redirect('/')
 
 @app.route('/map', methods=['POST'])
 def make_map():
+    """
+    Using information given by user, creates a map with isochrone and census data
+    """
     # Constants
     STATE_CODE = '06'
     COUNTY_CODE = '073'
