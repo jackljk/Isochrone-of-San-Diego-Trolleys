@@ -9,20 +9,22 @@ def union_stations(stations):
     Takes a list of geojsons and returns a shapely polygon of the union of all the stations
     """
     poly = sg.Polygon()
-    for station in stations:
-        for i in range(len(station['features'])):
-            if "last location: " in station['features'][i]['properties']['search_id']:
-                poly = poly.union(sg.shape(station['features'][i]['geometry']))
+    if len(stations) > 1:
+        for station in stations:
+            for i in range(len(station['features'])):
+                if "last location: " in station['features'][i]['properties']['search_id']:
+                    poly = poly.union(sg.shape(station['features'][i]['geometry']))
 
-    # Convert the unioned polygon into a GeoJSON Feature
-    union_feature = geojson.Feature(geometry=poly, properties={})
+        # Convert the unioned polygon into a GeoJSON Feature
+        union_feature = geojson.Feature(geometry=poly, properties={})
 
-    # Create a FeatureCollection with just the union feature
-    union_feature_collection = geojson.FeatureCollection([union_feature])
+        # Create a FeatureCollection with just the union feature
+        union_feature_collection = geojson.FeatureCollection([union_feature])
 
-    # Convert the FeatureCollection to a GeoJSON string
-    union_geojson_str = geojson.dumps(union_feature_collection)
-
+        # Convert the FeatureCollection to a GeoJSON string
+        union_geojson_str = geojson.dumps(union_feature_collection)
+    else:
+        union_geojson_str = stations[0]['features'][0]['geometry']
     return union_geojson_str
 
 def get_density_by_bg(df, gdf, unions, county='SD'):
