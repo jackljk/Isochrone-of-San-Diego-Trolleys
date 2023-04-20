@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <script src="https://kit.fontawesome.com/a7a1647c0e.js" crossorigin="anonymous"></script>
     <title>Index</title>
   </head>
 
   <body>
-    <button id="sidebar-open">sidebar</button>
+    <button id="sidebar-button"><i class="fa-solid fa-bars"></i></button>
     <div class="sidebar">
       <h1>Home</h1>
       <!-- Form for getting APP ID and API KEY -->
@@ -116,9 +117,11 @@
       </form>
       <button id="API-info-button-close" class="close-popup">Close</button>
     </div>
-    <p>
-      The number of people that the area reaches is: {{ reach }}
-    </p>
+    <div class="reaches">
+      <p>
+        The number of people that the area reaches is: {{ reach }}
+      </p>
+    </div>
     <div id="map">
       {{ map|safe }}
     </div>
