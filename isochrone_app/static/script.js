@@ -61,3 +61,18 @@ window.addEventListener("load", function() {
         popup.style.display = "none";
     });
 });
+
+// To open sidebar on button click
+window.addEventListener("load", function() {
+    var sidebar = document.querySelector(".sidebar");
+    var sidebarBtn = document.getElementById("sidebar-open");
+
+    sidebarBtn.addEventListener("click", function() {
+        if (sidebar.style.display == "none") {
+            sidebar.style.display = "block";
+        } else {
+            sidebar.style.display = "none";
+        }
+    });
+
+});
