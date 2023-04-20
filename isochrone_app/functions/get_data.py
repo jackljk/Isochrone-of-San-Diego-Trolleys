@@ -26,7 +26,7 @@ def make_union(locations):
     return [unions]
 
 
-def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_time = 600):
+def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_time):
     geojsons = []
     payload_list = []
     curr_locations = []
@@ -38,7 +38,7 @@ def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_tim
 
         if (i + 1) % 10 == 0 or i + 1 == len(locations):
             unions = make_union(curr_locations)
-
+            
 
             payload_data = {"departure_searches": payload_list, "unions": unions}
             payload_str = json.dumps(payload_data)
@@ -49,8 +49,6 @@ def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_tim
                 'X-Application-Id': APP_ID,
                 'X-Api-Key': API_KEY
             }
-
-
 
             response = requests.post(URL, headers=headers, data=payload_str)
 

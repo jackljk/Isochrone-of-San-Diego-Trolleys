@@ -46,3 +46,18 @@ window.addEventListener("load", function() {
         selector.add(option);
     }
 });
+
+// Open APPID and API input popup
+window.addEventListener("load", function() {
+    var popup = document.getElementById("API-info");
+    var popupBtn = document.getElementById("API-info-button-open");
+    var closeBtn = document.getElementById("API-info-button-close");
+
+    popupBtn.addEventListener("click", function() {
+        popup.style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", function() {
+        popup.style.display = "none";
+    });
+});

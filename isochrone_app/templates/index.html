@@ -5,12 +5,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     <title>Index</title>
   </head>
 
   <body>
     <h1>Home</h1>
-    <form action="/add_location" method="post">
+    <!-- Form for getting APP ID and API KEY -->
+    <button id="API-info-button-open" class="open-popup">Add APP ID and API KEY</button>
+    <div id="API-info" class="center-popup">
+      <form action="/APPID_APIKEY" method="post" id="form-API-info">
+        <h3>Enter APP ID and API Key</h3>
+        <label for="APP_ID">APP ID:</label>
+        <input type="string" id="APP_ID" name="APP_ID" /><br /><br />
+        <label for="API_KEY">API Key:</label>
+        <input type="string" id="API_KEY" name="API_KEY" /><br /><br />
+        <input type="submit" value="Submit" />
+      </form>
+      <form action="/add_location" method="post">
+
+      <button id="API-info-button-close" class="close-popup">Close</button>
+    </div>
       <h3>Select the input type:</h3>
       <input
         type="radio"
@@ -86,13 +101,7 @@
     </form>
 
     <h2>Extra Information</h2>
-    <form action="/map" , method="post">
-      <label for="APP_ID">APP ID:</label>
-      <input type="string" id="APP_ID" name="APP_ID" /><br /><br />
-
-      <label for="API_KEY">API Key:</label>
-      <input type="string" id="API_KEY" name="API_KEY" /><br /><br />
-
+    <form action="" , method="post">
       <label for="travelTime">Travel Time (In Minutes):</label>
       <input type="float" id="travelTime" name="travelTime" /><br /><br />
 
@@ -111,11 +120,15 @@
       </div>
 
       <h2>Trolley Stations:</h2>
-      <input type="checkbox" name="trolley" value="blue" />Blue Line<br />
-      <input type="checkbox" name="trolley" value="green" />Green Line<br />
-      <input type="checkbox" name="trolley" value="orange" />Orange Line<br />
+      <input type="checkbox" name="trolley" value="blue" {% if 'blue' in selected_checkboxes %}checked{% endif %} />Blue Line<br />
+      <input type="checkbox" name="trolley" value="green" {% if 'green' in selected_checkboxes %}checked{% endif %} />Green Line<br />
+      <input type="checkbox" name="trolley" value="orange" {% if 'orange' in selected_checkboxes %}checked{% endif %} />Orange Line<br />
 
       <input type="submit" value="submit" />
     </form>
+    <p>
+      The number of people that the area reaches is: {{ reach }}
+    </p>
+    {{ map|safe }}
   </body>
 </html>

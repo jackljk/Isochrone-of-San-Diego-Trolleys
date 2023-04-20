@@ -24,7 +24,7 @@ def union_stations(stations):
         # Convert the FeatureCollection to a GeoJSON string
         union_geojson_str = geojson.dumps(union_feature_collection)
     else:
-        union_geojson_str = stations[0]['features'][0]['geometry']
+        union_geojson_str = geojson.dumps(stations[0])
     return union_geojson_str
 
 def get_density_by_bg(df, gdf, unions, county='SD'):
@@ -55,9 +55,6 @@ def get_density_by_bg(df, gdf, unions, county='SD'):
     temp['tract'] = temp['TRACTCE'] + temp['BLKGRPCE']
 
     # get all polygons that intersect with the union of the biking geojsons
-    # wrtite the union to a temp file
-    with open('temp.geojson', 'w') as f:
-        f.write(unions)
     temp = temp[temp.intersects(sg.shape(geojson.loads(unions)[0]['geometry']))]
 
     # Save temp as a geojson to a variable
