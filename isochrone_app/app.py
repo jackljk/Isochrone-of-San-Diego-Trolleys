@@ -92,7 +92,7 @@ def add_location():
     if radio_button == 'latlng':
         # For when lat lng is given
         customLocations[name] = {'lat': lat, 'lng': lng}
-    else:
+    elif radio_button == 'address':
         # For when address is given
         result = gmaps.geocode(address)
         
@@ -103,7 +103,6 @@ def add_location():
             # If address does not return anything handle error
             flask.flash('Invalid Address')
             return flask.redirect('/')
-            
     return flask.redirect('/')
 
 @app.route('/remove_location', methods=['POST'])
