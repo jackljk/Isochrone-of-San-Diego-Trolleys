@@ -55,9 +55,25 @@
           name="signupform"
         >
           <div class="wrapper">
-            <input type="radio" name="input_type" id="option-1" value='latlng' checked />
-            <input type="radio" name="input_type" id="option-2" value="address"/>
-            <input type="radio" name="input_type" id="option-3" value="trolley"/>
+            <input
+              type="radio"
+              name="input_type"
+              id="option-1"
+              value="latlng"
+              checked
+            />
+            <input
+              type="radio"
+              name="input_type"
+              id="option-2"
+              value="address"
+            />
+            <input
+              type="radio"
+              name="input_type"
+              id="option-3"
+              value="trolley"
+            />
             <label for="option-1" class="option option-1">
               <div class="dot"></div>
               <span>Lat & Lng</span>
@@ -139,11 +155,18 @@
           <div id="trolley_fields" style="display: none">
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley" value="blue" {% if 'blue' in
-                selected_checkboxes %}checked{% endif %}/>
+                <input type="checkbox" class="checkbox-input" name="trolley"
+                value="blue" {% if 'blue' in selected_checkboxes %}checked{%
+                endif %} />
                 <span class="checkbox-tile">
                   <span class="checkbox-icon">
-                      <img src="{{ url_for('static', filename='images/blueline.png') }}" alt="blueline" width="60", height="40"/>
+                    <img
+                      src="{{ url_for('static', filename='images/blueline.png') }}"
+                      alt="blueline"
+                      width="60"
+                      ,
+                      height="40"
+                    />
                   </span>
                   <span class="checkbox-label">Blue Line</span>
                 </span>
@@ -151,11 +174,18 @@
             </div>
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley" value="green" {% if 'green' in
-                selected_checkboxes %}checked{% endif %}/>
+                <input type="checkbox" class="checkbox-input" name="trolley"
+                value="green" {% if 'green' in selected_checkboxes %}checked{%
+                endif %} />
                 <span class="checkbox-tile">
                   <span class="checkbox-icon">
-                      <img src="{{ url_for('static', filename='images/greenline.png') }}" alt="greenline" width="40", height="40"/>
+                    <img
+                      src="{{ url_for('static', filename='images/greenline.png') }}"
+                      alt="greenline"
+                      width="40"
+                      ,
+                      height="40"
+                    />
                   </span>
                   <span class="checkbox-label">Green Line</span>
                 </span>
@@ -163,18 +193,25 @@
             </div>
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley" value="orange" {% if 'orange' in
-                selected_checkboxes %}checked{% endif %}/>
+                <input type="checkbox" class="checkbox-input" name="trolley"
+                value="orange" {% if 'orange' in selected_checkboxes %}checked{%
+                endif %} />
                 <span class="checkbox-tile">
                   <span class="checkbox-icon">
-                      <img src="{{ url_for('static', filename='images/orangeline.png') }}" alt="orangeline" width="40", height="40"/>
+                    <img
+                      src="{{ url_for('static', filename='images/orangeline.png') }}"
+                      alt="orangeline"
+                      width="40"
+                      ,
+                      height="40"
+                    />
                   </span>
                   <span class="checkbox-label">Orange Line</span>
                 </span>
               </label>
             </div>
           </div>
-          
+
           <input
             type="submit"
             id="join-btn"
@@ -190,35 +227,44 @@
         <i class="fa-solid fa-caret-down"></i>
       </button>
       <div class="dropdown-container">
-        <table class="location-display">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Latitude</th>
-              <th>Longitude</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for name, location in locations.items() %}
-            <tr>
-              <td>{{ name }}</td>
-              <td>{{ location['lat'] }}</td>
-              <td>{{ location['lng'] }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="location-display">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for name, location in locations.items() %}
+              <tr>
+                <td>{{ name }}</td>
+                <td>{{ location['lat'] }}</td>
+                <td>{{ location['lng'] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
 
-        
         <h5>Remove Locations</h5>
+
         <form action="/remove_location" method="post">
-          <label for="name">Name:</label>
-          <select id="remove" name="remove">
-            {% for name, location in locations.items() %}
-            <option value="{{ name }}">{{ name }}</option>
-            {% endfor %}
-          </select>
-          <input type="submit" value="remove_data" />
+          <div class="remove-location-box" style="width: 200px; height: 50px">
+            <select id="remove" name="remove">
+              {% for name, location in locations.items() %}
+              <option value="{{ name }}">{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <input
+            type="submit"
+            id="join-btn"
+            name="join"
+            alt="Join"
+            value="Remove Location"
+          />
         </form>
       </div>
 
@@ -227,24 +273,96 @@
         <i class="fa-solid fa-caret-down"></i>
       </button>
       <div class="dropdown-container">
-        <form action="" , method="post">
-          <label for="travelTime">Travel Time (In Minutes):</label>
-          <input type="float" id="travelTime" name="travelTime" /><br /><br />
-          <label for="modeTransport">Mode of Transportation</label>
-          <select id="transportSelection" name="modeTransport">
-            <option value="driving">Driving</option>
-            <option value="walking">Walking</option>
-            <option value="cycling">Cycling</option>
-            <option value="eBike">E-Bikes</option>
-          </select>
-          <div id="avgspeed" style="display: none">
-            <label for="avgSpeed">Average Speed Mph:</label>
+        <form action="" , method="post" class="signupForm">
+          <div id="travelTime_field">
+            <h2>Input Travel Time</h2>
+            <ul class="noBullet">
+              <li>
+                <input
+                  type="string"
+                  class="inputFields"
+                  id="travelTime"
+                  name="travelTime"
+                  placeholder="Travel Time(Mins)"
+                />
+              </li>
+            </ul>
+          </div>
+
+          <div id="transport_mode">
+            <div class="checkbox-wrapper-16">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox-input" name="modeTransport" value="bike" />
+                <span class="checkbox-tile transport">
+                  <span class="checkbox-icon">
+                    <i
+                      class="fa-solid fa-bicycle fa-2xl"
+                      style="margin-bottom: 20px"
+                    ></i>
+                  </span>
+                  <span class="checkbox-label">Bike</span>
+                </span>
+              </label>
+            </div>
+            <div class="checkbox-wrapper-16">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox-input" name="modeTransport" value="ebike"/>
+                <span class="checkbox-tile transport">
+                  <span class="checkbox-icon">
+                    <i
+                      class="fa-solid fa-person-biking fa-2xl"
+                      style="margin-bottom: 20px"
+                    ></i>
+                  </span>
+                  <span class="checkbox-label">E-Bike</span>
+                </span>
+              </label>
+            </div>
+            <div class="checkbox-wrapper-16">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox-input" name="modeTransport" value="walk"/>
+                <span class="checkbox-tile transport">
+                  <span class="checkbox-icon">
+                    <i
+                      class="fa-solid fa-person-walking fa-2xl"
+                      style="margin-bottom: 20px"
+                    ></i>
+                  </span>
+                  <span class="checkbox-label">Walking</span>
+                </span>
+              </label>
+            </div>
+            <div class="checkbox-wrapper-16">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox-input" name="modeTransport" value="drive"/>
+                <span class="checkbox-tile transport">
+                  <span class="checkbox-icon">
+                    <i
+                      class="fa-solid fa-car fa-2xl"
+                      style="margin-bottom: 20px"
+                    ></i>
+                  </span>
+                  <span class="checkbox-label">Car</span>
+                </span>
+              </label>
+            </div>
+          </div>
+          <div id="avgspeed" class="remove-location-box" style="width: 250px; height: 50px; display: none">
+            <label for="avgSpeed">E-Bike Average Speed (Mph):</label>
             <select id="avgSpeedSelector" name="avgSpeed"></select>
             <br /><br />
           </div>
 
-          <input type="submit" value="submit" />
+          <input
+            type="submit"
+            id="join-btn"
+            name="join"
+            alt="Join"
+            value="Map Isochrones"
+          />
         </form>
+
+        
       </div>
 
       <!-- Flash Messages -->

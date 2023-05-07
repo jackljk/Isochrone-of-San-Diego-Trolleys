@@ -33,17 +33,18 @@ window.addEventListener("load", function () {
 
 // For avg speed using E-bikes
 window.addEventListener("load", function () {
-  var transportSelection = document.getElementById("transportSelection");
+  var transportSelection = document.getElementById("checkbox-ebike");
   var avgSpeedDiv = document.getElementById("avgspeed");
 
-  transportSelection.addEventListener("change", function () {
-    if (transportSelection.value == "eBike") {
+  // only show avg speed if ebike is selected
+  transportSelection.addEventListener("click", function () {
+    if (transportSelection.checked) {
       avgSpeedDiv.style.display = "block";
-      console.log("eBike selected");
     } else {
       avgSpeedDiv.style.display = "none";
     }
-  });
+  }
+  );
 });
 
 // For the avg speed selector

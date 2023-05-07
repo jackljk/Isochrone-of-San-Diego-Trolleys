@@ -124,6 +124,8 @@ def make_map():
     # Constants
     STATE_CODE = '06'
     COUNTY_CODE = '073'
+    COLORS_CHOLOR = ["YlOrRd", "PuBuGn", "GnBu", "YlGnBu"]
+    COLORS_ISO = ["#FFA500", "#6495ED", "#228B22", "#00CED1"]
     global customLocations
     global map_obj
     global APP_ID
@@ -144,42 +146,51 @@ def make_map():
         flask.flash('Missing Travel Time')
         return flask.redirect('/')
     
-    
-    # Fixing mode of transport for API
-    if mode_of_transport == "driving":
-        mode_of_transport = {"type": "driving"}
-    if mode_of_transport == "walking":
-        mode_of_transport = {"type": "walking"}
-    if mode_of_transport == "cycling":
-        mode_of_transport = {"type": "cycling"}
-    if mode_of_transport == "eBike":
-        mode_of_transport = {"type": "cycling"}
-        travel_time_val = (float(avg_speed)/10) * float(travel_time_val)
+    # Get list of Mode of Transportation
+    mode_of_transport = flask.request.form.getlist('modeTransport')
+    print(mode_of_transport)
+
+    # Creating Map
+    map_obj = create_new_map()
 
     # add multiple dictionaries into one dictionary
     locations = {**customLocations}
     for trolley in TROLLEY_STATIONS.values():
         locations = {**locations, **trolley}
     
-    # Getting Isochrone Data
-    if type(travel_time_val) != float:
-        travel_times = get_travel_times(locations, mode_of_transport, API_KEY, APP_ID, 600)
-    else:
-        travel_times = get_travel_times(locations, mode_of_transport, API_KEY, APP_ID, travel_time_val)
+    for transport in mode_of_transport: # Loop through all the selected modes of transports
+        
+        # Fixing mode of transport for API
+        if transport == "drive":
+            transport_API = {"type": "driving"}
+        if transport == "walk":
+            transport_API = {"type": "walking"}
+        if transport == "bike":
+            transport_API = {"type": "cycling"}
+        if transport == "ebike":
+            transport_API = {"type": "cycling"}
+            travel_time_val = (float(avg_speed)/10) * float(travel_time_val)
 
-    # Data Prep
-    union = union_stations(travel_times)
-    census_data = get_census_data(STATE_CODE, COUNTY_CODE)
-    data_df, geojson_str = get_density_by_bg(census_data, gdf, union)
+        # Getting Isochrone Data
+        if type(travel_time_val) != float:
+            travel_times = get_travel_times(locations, transport_API, API_KEY, APP_ID, 600)
+        else:
+            travel_times = get_travel_times(locations, transport_API, API_KEY, APP_ID, travel_time_val)
 
-    geojson_json = geojson.loads(geojson_str)
-    geojson_json, data_df  = update_shapes(geojson_json, union, data_df)
+        # Data Prep
+        union = union_stations(travel_times)
+        census_data = get_census_data(STATE_CODE, COUNTY_CODE)
+        data_df, geojson_str = get_density_by_bg(census_data, gdf, union)
 
-    # Creating Map
-    map_obj = create_new_map()
-    update_map_cp(map_obj, geojson_json, data_df, 'Populations')
-    update_map_isochrone(map_obj, union, 'Isochrone', 'red')
-    folium.LayerControl().add_to(map_obj)
+        geojson_json = geojson.loads(geojson_str)
+        geojson_json, data_df  = update_shapes(geojson_json, union, data_df)
+
+        
+        update_map_cp(map_obj, geojson_json, data_df, 'Populations-' + transport)
+        update_map_isochrone(map_obj, union, 'Isochrone-' + transport, 'red')
+        folium.LayerControl().add_to(map_obj)
+
+        # Add the data of the population to a table.
 
     return flask.render_template('index.html', map=map_obj._repr_html_(), locations=customLocations, 
                                  reach=round(data_df['H1_001N'].sum()), 
