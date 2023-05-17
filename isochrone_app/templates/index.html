@@ -17,8 +17,8 @@
   </head>
 
   <body>
-    <button id="sidebar-button"><i class="fa-solid fa-bars"></i></button>
-    <div class="sidebar">
+    <button id="sidebar-button" style="left: 375px; background-color: transparent;"><i class="fa-solid fa-bars"></i></button>
+    <div class="sidebar" style="left:0px; width:400px">
       <button class="dropdown-button">
         <div class="header">API</div>
         <i class="fa-solid fa-caret-down"></i>
@@ -155,7 +155,7 @@
           <div id="trolley_fields" style="display: none">
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley"
+                <input type="checkbox" class="checkbox-input" name="trolleys"
                 value="blue" {% if 'blue' in selected_checkboxes %}checked{%
                 endif %} />
                 <span class="checkbox-tile">
@@ -174,7 +174,7 @@
             </div>
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley"
+                <input type="checkbox" class="checkbox-input" name="trolleys"
                 value="green" {% if 'green' in selected_checkboxes %}checked{%
                 endif %} />
                 <span class="checkbox-tile">
@@ -193,7 +193,7 @@
             </div>
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="trolley"
+                <input type="checkbox" class="checkbox-input" name="trolleys"
                 value="orange" {% if 'orange' in selected_checkboxes %}checked{%
                 endif %} />
                 <span class="checkbox-tile">
@@ -306,7 +306,7 @@
             </div>
             <div class="checkbox-wrapper-16">
               <label class="checkbox-wrapper">
-                <input type="checkbox" class="checkbox-input" name="modeTransport" value="ebike"/>
+                <input type="checkbox" class="checkbox-input" name="modeTransport" value="ebike" id="checkbox-ebike"/>
                 <span class="checkbox-tile transport">
                   <span class="checkbox-icon">
                     <i
@@ -361,14 +361,39 @@
             value="Map Isochrones"
           />
         </form>
-
-        
+      </div>
+      <button class="dropdown-button" id="population-reached">
+        <div class="header">Population Reached</div>
+        <i class="fa-solid fa-caret-down"></i>
+      </button>
+      <div class="dropdown-container">
+        <div class="table-container">
+          <table class="location-display">
+            <thead>
+              <tr>
+                <th>Transportation Mode</th>
+                <th>Population Reached</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for transport, population in popData.items() %}
+              <tr>
+                <td>{{ transport }}</td>
+                <td>{{ population }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+
       <!-- Flash Messages -->
+      <br><br>
       {% with messages = get_flashed_messages() %} {% if messages %}
       <div class="flashed">{{ messages[-1] }}</div>
       {% endif %} {% endwith %}
+
     </div>
     <div id="API-info" class="center-popup">
       <form action="/APPID_APIKEY" method="post" id="form-API-info">
@@ -381,9 +406,9 @@
       </form>
       <button id="API-info-button-close" class="close-popup">Close</button>
     </div>
-    <div class="reaches">
+    <!-- <div class="reaches">
       <p>The number of people that the area reaches is: {{ reach }}</p>
-    </div>
+    </div> -->
     <div id="map">{{ map|safe }}</div>
   </body>
 </html>

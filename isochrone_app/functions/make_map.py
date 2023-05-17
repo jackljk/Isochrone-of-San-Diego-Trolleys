@@ -8,7 +8,6 @@ southwest, northeast= [32.528832, -117.203757], [33.080276, -116.912583] # Bound
 
 def create_new_map():
     map_obj = folium.Map(location=[lat, lng], zoom_start=13)
-    # map_obj.fit_bounds([southwest, northeast])
 
     return map_obj
 

@@ -27,7 +27,7 @@ window.addEventListener("load", function () {
     latlng_fields.style.display = "none";
     address_fields.style.display = "none";
     trolley_fields.style.display = "flex";
-    submit_button.style.display = "none";
+    submit_button.style.display = "block";
   });
 });
 
@@ -116,8 +116,15 @@ window.addEventListener("load", function () {
     });
   }
 
-
 });
+
+const populationDiv = document.getElementById("population-reached");
+  console.log(popData);
+  if (Object.keys(popData).length == 0) {
+    populationDiv.style.display = "none";
+  } else {
+    populationDiv.style.display = "block";
+  }
 
 
 // For forms

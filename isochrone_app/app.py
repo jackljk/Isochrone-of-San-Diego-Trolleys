@@ -22,6 +22,8 @@ API_KEY = ''
 # Variables
 map_obj = create_new_map()
 customLocations = {} # Dictionary of locations given by user
+popData = {} # Dictionary of population data for each transportation mode
+trolleys = [] # List of trolley stations that are selected
 gdf = gpd.read_file('isochrone_app\\CA_shape_file\\bg\\cb_2021_06_bg_500k.shp') # Shape file for San Diego County
 
 
@@ -35,7 +37,7 @@ def index():
     """
     Renders the index.html page
     """
-    return flask.render_template('index.html', locations=customLocations,  map=map_obj._repr_html_())
+    return flask.render_template('index.html', locations=customLocations,  map=map_obj._repr_html_(), popData=popData)
 
 @app.route('/APPID_APIKEY', methods=['POST'])
 def APPIN_APIKEY():
@@ -68,6 +70,8 @@ def add_location():
     """
     Adds a location to the customLocations dictionary
     """
+    global customLocations
+    global trolleys
     # For Lat lng
     name = flask.request.form['name']
     lat = flask.request.form['lat']
@@ -75,24 +79,18 @@ def add_location():
     # For Address
     address = flask.request.form['address']
     zipcode = flask.request.form['zipcode']
-    address = address + ", San Diego, CA " + zipcode
     
     # Handling if location already exists Error
     if name in customLocations.keys() or address in customLocations.keys():
         flask.flash('Location ' + name + ' already exists')
         return flask.redirect('/')
-    
-    # Handling if information is missing
-    if (lat == '' or lng == '' or name == '') and (address == '' or zipcode == ''): 
-        flask.flash('Missing information')
-        return flask.redirect('/')
-    
     # Adding location to dictionary
     radio_button = flask.request.form['input_type']
-    if radio_button == 'latlng':
+    if radio_button == 'latlng' and lat != '' and lng != '':
         # For when lat lng is given
         customLocations[name] = {'lat': lat, 'lng': lng}
-    elif radio_button == 'address':
+    elif radio_button == 'address' and address != '':    
+        address = address + ", San Diego, CA " + zipcode
         # For when address is given
         result = gmaps.geocode(address)
         
@@ -103,6 +101,16 @@ def add_location():
             # If address does not return anything handle error
             flask.flash('Invalid Address')
             return flask.redirect('/')
+        
+    
+    # Getting the Trolley Stations
+    trolleys = flask.request.form.getlist('trolleys')
+    TROLLEY_STATIONS = trolley_checklist(trolleys)
+
+    
+    for trolley in TROLLEY_STATIONS.values():
+        customLocations = {**customLocations, **trolley}
+
     return flask.redirect('/')
 
 @app.route('/remove_location', methods=['POST'])
@@ -111,9 +119,9 @@ def remove_location():
     Removes a location from the customLocations dictionary
     """
     name = flask.request.form['remove']
-    print(name)
-    print(customLocations)
     del customLocations[name]
+
+    # add option to clear the entire list
     return flask.redirect('/')
 
 @app.route('/', methods=['POST'])
@@ -126,49 +134,45 @@ def make_map():
     COUNTY_CODE = '073'
     COLORS_CHOLOR = ["YlOrRd", "PuBuGn", "GnBu", "YlGnBu"]
     COLORS_ISO = ["#FFA500", "#6495ED", "#228B22", "#00CED1"]
-    global customLocations
-    global map_obj
-    global APP_ID
-    global API_KEY
+    global customLocations, trolleys, map_obj, APP_ID, API_KEY, popData
     
-    # Getting the Trolley Stations
-    trolleys = flask.request.form.getlist('trolley')
-    TROLLEY_STATIONS = trolley_checklist(trolleys)
     
     # Getting Mode of Transportation
     mode_of_transport = flask.request.form['modeTransport']
     travel_time_val = float(flask.request.form['travelTime']) * 60
     avg_speed = flask.request.form['avgSpeed']
     
-    
-    # Error Handling if travel time is missing
-    if travel_time_val == '':
-        flask.flash('Missing Travel Time')
-        return flask.redirect('/')
+    # Reset Pop Data
+    popData = {}
     
     # Get list of Mode of Transportation
     mode_of_transport = flask.request.form.getlist('modeTransport')
-    print(mode_of_transport)
 
     # Creating Map
     map_obj = create_new_map()
 
     # add multiple dictionaries into one dictionary
     locations = {**customLocations}
-    for trolley in TROLLEY_STATIONS.values():
-        locations = {**locations, **trolley}
     
     for transport in mode_of_transport: # Loop through all the selected modes of transports
         
         # Fixing mode of transport for API
         if transport == "drive":
             transport_API = {"type": "driving"}
+            CP_COLOR = COLORS_CHOLOR[0]
+            ISO_COLOR = COLORS_ISO[0]
         if transport == "walk":
             transport_API = {"type": "walking"}
+            CP_COLOR = COLORS_CHOLOR[1]
+            ISO_COLOR = COLORS_ISO[1]
         if transport == "bike":
             transport_API = {"type": "cycling"}
+            CP_COLOR = COLORS_CHOLOR[2]
+            ISO_COLOR = COLORS_ISO[2]
         if transport == "ebike":
             transport_API = {"type": "cycling"}
+            CP_COLOR = COLORS_CHOLOR[3]
+            ISO_COLOR = COLORS_ISO[3]
             travel_time_val = (float(avg_speed)/10) * float(travel_time_val)
 
         # Getting Isochrone Data
@@ -186,14 +190,14 @@ def make_map():
         geojson_json, data_df  = update_shapes(geojson_json, union, data_df)
 
         
-        update_map_cp(map_obj, geojson_json, data_df, 'Populations-' + transport)
-        update_map_isochrone(map_obj, union, 'Isochrone-' + transport, 'red')
-        folium.LayerControl().add_to(map_obj)
+        update_map_cp(map_obj, geojson_json, data_df, 'Populations-' + transport, fill_color=CP_COLOR)
+        update_map_isochrone(map_obj, union, 'Isochrone-' + transport, ISO_COLOR)
 
         # Add the data of the population to a table.
-
-    return flask.render_template('index.html', map=map_obj._repr_html_(), locations=customLocations, 
-                                 reach=round(data_df['H1_001N'].sum()), 
+        popData[transport] = round(data_df['H1_001N'].sum())
+    layerControl = folium.LayerControl()
+    layerControl.add_to(map_obj)
+    return flask.render_template('index.html', map=map_obj._repr_html_(), locations=customLocations, popData=popData,
                                  selected_checkboxes = trolleys)
 
 if __name__ == '__main__':
