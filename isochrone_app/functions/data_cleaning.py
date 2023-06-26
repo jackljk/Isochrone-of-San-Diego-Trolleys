@@ -24,6 +24,7 @@ def union_stations(stations):
         # Convert the FeatureCollection to a GeoJSON string
         union_geojson_str = geojson.dumps(union_feature_collection)
     else:
+        print(stations)
         union_geojson_str = geojson.dumps(stations[0])
     return union_geojson_str
 

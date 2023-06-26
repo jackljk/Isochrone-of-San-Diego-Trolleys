@@ -200,5 +200,22 @@ def make_map():
     return flask.render_template('index.html', map=map_obj._repr_html_(), locations=customLocations, popData=popData,
                                  selected_checkboxes = trolleys)
 
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    """
+    Resets everything except for the API keys
+    """ 
+    
+    global customLocations, trolleys, map_obj, APP_ID, API_KEY, popData
+    
+    # Resetting variables
+    customLocations = {}
+    trolleys = []
+    map_obj = create_new_map()
+    popData = {}
+    
+    return flask.redirect('/')
+
 if __name__ == '__main__':
     app.run(debug=True)
