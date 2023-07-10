@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import requests
 import pandas as pd
+import time
 
 URL = "https://api.traveltimeapp.com/v4/time-map"
 
@@ -51,6 +52,13 @@ def get_travel_times(locations, transportation_type, API_KEY, APP_ID, travel_tim
             }
 
             response = requests.post(URL, headers=headers, data=payload_str)
+            
+            # if response.status_code != 200: wait 60 seconds and try again
+            print(response.status_code)
+            if response.status_code != 200:
+                time.sleep(60)
+                response = requests.post(URL, headers=headers, data=payload_str)
+                
 
 
 

@@ -14,7 +14,7 @@ def create_new_map():
 
 def update_map_cp(map_obj, geoData, data_df, name, fill_color='YlGn'):
     tooltip = folium.GeoJsonTooltip(fields=['GEOID', 'H1_001N']) # Tooltip for choropleth map
-
+    print(geoData.keys())
     cp = folium.Choropleth(
     geo_data=geoData,
     name=name,

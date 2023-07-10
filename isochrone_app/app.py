@@ -189,7 +189,7 @@ def make_map():
         geojson_json = geojson.loads(geojson_str)
         geojson_json, data_df  = update_shapes(geojson_json, union, data_df)
 
-        
+        print(data_df.columns)
         update_map_cp(map_obj, geojson_json, data_df, 'Populations-' + transport, fill_color=CP_COLOR)
         update_map_isochrone(map_obj, union, 'Isochrone-' + transport, ISO_COLOR)
 
