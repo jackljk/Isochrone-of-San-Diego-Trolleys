@@ -29,6 +29,9 @@
             To use this app, you need to create an account at
             <a href="https://account.traveltime.com/">TravelTime</a> then add
             the APP ID and API KEY below.
+            <br>
+            Also if the method to add a location via address is to be used, then
+            the Google Maps API also needs to be added but is not a requirement.
           </p>
         </div>
         <!-- Form for getting APP ID and API KEY -->
@@ -411,9 +414,11 @@
       <form action="/APPID_APIKEY" method="post" id="form-API-info">
         <h3>Enter APP ID and API Key</h3>
         <label for="APP_ID">APP ID:</label>
-        <input type="string" id="APP_ID" name="APP_ID" /><br /><br />
+        <input type="string" id="APP_ID" name="APP_ID" style="width: 50%;" /><br />
         <label for="API_KEY">API Key:</label>
-        <input type="string" id="API_KEY" name="API_KEY" /><br /><br />
+        <input type="string" id="API_KEY" name="API_KEY" style="width: 50%;" /><br />
+        <label for="GMAP_API">Google Maps API: </label>
+        <input type="string" id="GMAP_API" name="GMAP_API" style="width: 50%;" /><br />
         <input type="submit" value="Submit" />
       </form>
       <button id="API-info-button-close" class="close-popup">Close</button>

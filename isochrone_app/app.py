@@ -15,10 +15,15 @@ import googlemaps
 
 
 # CONSTANTS
-GMAPI = "AIzaSyDSbu_7Yc_uqzjni4DboQS53L14pulaMj4"
-gmaps = googlemaps.Client(key=GMAPI)
+gmaps = ''
 APP_ID = ''
 API_KEY = ''
+DATAFRAME = {
+    'drive': gpd.GeoDataFrame(),
+    'walk': gpd.GeoDataFrame(),
+    'bike': gpd.GeoDataFrame(),
+    'ebike': gpd.GeoDataFrame()
+}
 # Variables
 map_obj = create_new_map()
 customLocations = {} # Dictionary of locations given by user
@@ -46,9 +51,15 @@ def APPIN_APIKEY():
     """
     global APP_ID
     global API_KEY
+    global gmaps
 
     APP_ID_IN = flask.request.form['APP_ID']
     API_KEY_IN = flask.request.form['API_KEY']
+    GMAP_API = flask.request.form['GMAP_API']
+    
+    # If Gmap API is given, set up gmaps client
+    if GMAP_API != '':
+        gmaps = googlemaps.Client(key=GMAP_API)
 
      # Error Handling if API Key or APP ID is missing
     if API_KEY_IN == '':
@@ -58,6 +69,7 @@ def APPIN_APIKEY():
     if APP_ID_IN == '':
         flask.flash('Missing APP ID')
         return flask.redirect('/')
+    
     
     APP_ID = APP_ID_IN
     API_KEY = API_KEY_IN
@@ -91,8 +103,14 @@ def add_location():
         customLocations[name] = {'lat': lat, 'lng': lng}
     elif radio_button == 'address' and address != '':    
         address = address + ", San Diego, CA " + zipcode
-        # For when address is given
-        result = gmaps.geocode(address)
+        
+        if gmaps == '':
+            # If gmaps client is not set up
+            flask.flash('Missing GMAP API Key add from API Key and APP ID page')
+            return flask.redirect('/')
+        else:
+            # For when address is given
+            result = gmaps.geocode(address)
         
         # Check if address is valid via gmaps API
         if result:
@@ -134,7 +152,7 @@ def make_map():
     COUNTY_CODE = '073'
     COLORS_CHOLOR = ["YlOrRd", "PuBuGn", "GnBu", "YlGnBu"]
     COLORS_ISO = ["#FFA500", "#6495ED", "#228B22", "#00CED1"]
-    global customLocations, trolleys, map_obj, APP_ID, API_KEY, popData
+    global customLocations, trolleys, map_obj, APP_ID, API_KEY, popData, DATAFRAMES
     
     
     # Getting Mode of Transportation
@@ -184,17 +202,17 @@ def make_map():
         # Data Prep
         union = union_stations(travel_times)
         census_data = get_census_data(STATE_CODE, COUNTY_CODE)
-        data_df, geojson_str = get_density_by_bg(census_data, gdf, union)
+        DATAFRAME[transport], geojson_str = get_density_by_bg(census_data, gdf, union)
 
         geojson_json = geojson.loads(geojson_str)
-        geojson_json, data_df  = update_shapes(geojson_json, union, data_df)
+        geojson_json, DATAFRAME[transport]  = update_shapes(geojson_json, union, DATAFRAME[transport])
 
-        print(data_df.columns)
-        update_map_cp(map_obj, geojson_json, data_df, 'Populations-' + transport, fill_color=CP_COLOR)
+
+        update_map_cp(map_obj, geojson_json, DATAFRAME[transport], 'Populations-' + transport, fill_color=CP_COLOR)
         update_map_isochrone(map_obj, union, 'Isochrone-' + transport, ISO_COLOR)
 
         # Add the data of the population to a table.
-        popData[transport] = round(data_df['H1_001N'].sum())
+        popData[transport] = round(DATAFRAME[transport]['H1_001N'].sum())
     layerControl = folium.LayerControl()
     layerControl.add_to(map_obj)
     return flask.render_template('index.html', map=map_obj._repr_html_(), locations=customLocations, popData=popData,

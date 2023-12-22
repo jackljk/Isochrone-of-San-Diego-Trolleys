@@ -10,7 +10,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 23%;
-  height: 23%;
+  height: 30%;
   background-color: #fff;
   z-index: 100;
   display: none;
@@ -29,6 +29,7 @@
   height: 100%;
   margin-bottom: -20px;
 }
+
 
 #map {
   position: absolute;
